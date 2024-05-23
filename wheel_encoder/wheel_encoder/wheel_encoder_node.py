@@ -5,7 +5,7 @@ import serial
 from serial.serialutil import SerialException
 import os
 
-class WheelEncoderNode(Node):
+class wheel_encoder_node(Node):
     def __init__(self):
         super().__init__('wheel_encoder_node')
         
@@ -35,16 +35,24 @@ class WheelEncoderNode(Node):
                 # 시리얼 포트에서 한 줄을 읽고, UTF-8로 디코드하여 공백을 제거합니다.
                 line = self.serial_port.readline().decode('utf-8').strip()
                 self.get_logger().info(f'Received line: {line}')  # 디버깅 메시지 추가
-                # 수신된 데이터가 "speed:"로 시작하는지 확인합니다.
-                if line.startswith("speed:"):
-                    # "speed:" 뒤의 값을 부동 소수점 숫자로 변환합니다.
-                    speed_val = float(line.split(":")[1].strip())
-                    # Float32 메시지를 생성하고 데이터를 설정합니다.
-                    msg = Float32()
-                    msg.data = speed_val
-                    # 퍼블리셔를 통해 메시지를 게시합니다.
-                    self.publisher_.publish(msg)
-                    self.get_logger().info(f'Published speed: {speed_val}')
+
+                # "speed:"로 시작하는 모든 값을 찾아 파싱합니다.
+                parts = line.split('speed:')
+                for part in parts:
+                    if part.strip():
+                        try:
+                            # "speed:" 뒤의 값을 부동 소수점 숫자로 변환합니다.
+                            speed_val = float(part.strip())
+                            
+                            # Float32 메시지를 생성하고 데이터를 설정합니다.
+                            msg = Float32()
+                            msg.data = speed_val
+                            
+                            # 퍼블리셔를 통해 메시지를 게시합니다.
+                            self.publisher_.publish(msg)
+                            self.get_logger().info(f'Published speed: {speed_val}')
+                        except ValueError as e:
+                            self.get_logger().error(f'Error parsing speed value: {e}')
             except Exception as e:
                 # 데이터를 읽는 동안 오류가 발생하면 오류 메시지를 출력합니다.
                 self.get_logger().error(f'Error reading serial data: {e}')
@@ -55,7 +63,7 @@ def main(args=None):
     node = None
     try:
         # WheelEncoderNode 인스턴스를 생성하고, 스핀하여 노드를 실행합니다.
-        node = WheelEncoderNode()
+        node = wheel_encoder_node()
         rclpy.spin(node)
     except Exception as e:
         # 메인 함수에서 오류가 발생하면 오류 메시지를 출력합니다.
