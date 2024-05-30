@@ -15,5 +15,16 @@ def generate_launch_description():
                 {'baud_rate': 115200}
             ],
             arguments=['--ros-args', '--log-level', 'info']
+        ),
+        Node(
+            package='my_serial_pkg',
+            executable='wheel_encoder_node',
+            name='wheel_encoder_node',
+            output='screen',
+            parameters=[
+                {'serial_port': '/dev/ttyACM0'},
+                {'baud_rate': 115200}
+            ],
+            arguments=['--ros-args', '--log-level', 'info']
         )
     ])

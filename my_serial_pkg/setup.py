@@ -8,6 +8,10 @@ setup(
     name=package_name,
     version='0.0.0',
     packages=[package_name],
+    py_modules=[
+        'my_serial_pkg.wheel_encoder_node',
+        'my_serial_pkg.serial_reader',
+    ],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -23,6 +27,7 @@ setup(
     entry_points={
         'console_scripts': [
             'serial_reader = my_serial_pkg.serial_reader:main',
+            'wheel_encoder_node = my_serial_pkg.wheel_encoder_node:main',
         ],
     },
 )
